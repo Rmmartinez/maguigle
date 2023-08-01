@@ -1,0 +1,106 @@
+package com.practica.maguigle.services;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.servlet.MultipartAutoConfiguration;
+import org.springframework.stereotype.Service;
+
+import com.practica.maguigle.entities.WebPage;
+
+import static org.hibernate.internal.util.StringHelper.isBlank;
+
+
+@Service
+public class SpiderService {
+
+	@Autowired
+	private SearchService searchService;
+	
+	public String indexWebPage() {
+		//procesa el contenido de la web para ver de qué se trata 
+		//y lo guarda en la BD
+		
+		String url = "https://www.bbc.com/";
+		String content = getWebContent(url);
+		
+		if(isBlank(content)) {
+			return "";
+		}
+		
+		indexAndSaveWebPage(url, content);
+		
+		gotToNextWebPage(content);
+		
+	
+	}
+
+
+	private void gotToNextWebPage(String content){
+		
+	}
+	
+	private List<String> getLinks(String content){
+		List<String> links = new ArrayList<>();
+		String[] aux = content.split("/href=\"");
+		Arrays.stream(aux).forEach(str -> {
+			String[] aux2 = str.split("\"");
+			links.add(aux2[0]);
+		});
+		return links;
+	}
+	
+	
+	private void indexAndSaveWebPage(String url, String content) {
+		String title = getTitle(content);
+		String description = getDescription(content);
+		
+		WebPage webPage = new WebPage();
+		webPage.setDescription(description);
+		webPage.setTitle(title);
+		webPage.setUrl(url);
+		
+		searchService.save(webPage);
+	}
+
+	
+	public String getTitle(String content) {
+		String[] aux = content.split("<title>");
+		String[] aux2 = aux[1].split("</title>");
+		return aux2[0];
+	}
+	
+	public String getDescription(String content) {
+		String[] aux = content.split("<meta name=\"description\" content=\"");
+		String[] aux2 = aux[1].split("\">");
+		return aux2[0];
+	}
+	
+	
+	private String getWebContent(String link) {
+        try {
+            URL url = new URL(link);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            String encoding = conn.getContentEncoding();
+
+            InputStream input = conn.getInputStream();
+
+            Stream<String> lines = new BufferedReader(new InputStreamReader(input))
+                    .lines();
+
+            return lines.collect(Collectors.joining());
+        } catch (IOException e) {
+            System.out.print(e.getMessage());
+        }
+        return "";
+    }
+	
+}

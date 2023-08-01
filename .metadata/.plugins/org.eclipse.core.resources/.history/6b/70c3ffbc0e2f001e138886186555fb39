@@ -1,0 +1,83 @@
+body{
+    font-family: 'Roboto', sans-serif;
+}
+
+#main{
+    width: 500px; 
+    margin: auto;
+    text-align: center;
+}        
+
+#main-resultados{
+    margin: auto;
+}      
+
+#logo{
+    width:300px;
+    padding-top: 30px;
+}
+
+#logo-resultados{
+    width:110px;
+    position: absolute;
+    left: 30px;
+    top: 27.5px;
+}
+
+.buscador{ 
+    width: 100%;
+    margin: 20px 0px;
+    height: 33px;
+    border-radius: 25px;
+    border-color: #CCC;
+    padding-left: 15px;
+}
+
+input {
+  width: 100%;
+  margin: 20px 0px;
+  height: 33px;
+  border-radius: 25px;
+  border-color: #CCC;
+  padding-left: 15px;
+}
+
+#buscador-resultados{ 
+    width: 500px;
+    margin: 20px 0px;
+    margin-left: 154px;
+    height: 33px;
+    border-radius: 25px;
+    border-color: #CCC;
+    padding-left: 15px;
+}
+
+button{
+    padding: 7px 15px;
+}
+
+
+#resultados{
+    max-width: 600px;
+    margin-left: 159px;
+    padding-bottom: 30px;
+}
+
+.resultado h3{
+    color: #0272d3;
+    margin-bottom: 4px;
+    
+}
+
+.total-resultados{
+    font-size: 13px;
+}
+
+.footer{
+	font-size: 15px;
+	text-align: center;
+}
+
+.header-main{
+    text-align: right;
+}

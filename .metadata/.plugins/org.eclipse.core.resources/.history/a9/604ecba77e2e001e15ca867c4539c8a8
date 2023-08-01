@@ -1,0 +1,22 @@
+package com.practica.maguigle.services;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.practica.maguigle.entities.WebPage;
+
+@Service
+public class SearchService {
+	
+	
+	public List<WebPage> search(String textSearch) {
+		List<WebPage> result = new ArrayList<>();
+		WebPage wp= new WebPage();
+		wp.setTitle("titulo");
+		wp.setDescription("prueba");
+		result.add(wp);
+		return result;
+	}
+}

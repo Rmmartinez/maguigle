@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maguigle</title>
+    <link rel = "stylesheet" href="style.css"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id = "main-resultados">
+    <div style="text-align: right; padding-right:30px;">
+		<span>
+			<a href="https://mail.google.com/" style="color:black; text-decoration:none">Correo</a>
+		<hn>
+		<span>
+			<a href="#" style="color:black;text-decoration:none">Imágenes</a>
+		</span>
+		<span style="position: absolute; top: 7.5px; margin-left: 5px;">
+			<a href="#">
+				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" style="color:black;text-decoration:none" class="bi bi-person-circle" viewBox="0 0 16 16">
+				  <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+				  <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+				</svg>
+			</a>s
+		</span>
+	</div>
+        <img id = "logo-resultados" src="img/logo.png"/>
+        <input id = "buscador-resultados" type="text"/>
+        
+        <hr/>
+        <div id="resultados">
+            <span class="total-resultados">
+                Cerca de 2.920.000.000 resultados (0,40 segundos) 
+            </span>
+            <div id = "links">
+            
+            </div>
+        </div>
+        <hr/>
+        
+        
+    </div>
+    <div class="footer">
+    	<span>
+           Rosario Magali Martinez
+        </span>
+    </div>
+
+<script>
+    let aux = document.location.href.split('?query=');
+    let query = aux[1];
+    document.getElementById("buscador-resultados").value = query;
+    
+    fetch('http://localhost:8080/api/search?query='+query)
+    .then(response => response.json())
+    .then(json =>{
+        console.log(json);
+        let html = '';
+        for(let resultadoBusqueda of json){
+            html += getResultados(resultadoBusqueda);
+        }
+        document.getElementById("links").outerHTML = html;
+    });
+
+    function getResultados(resultadoBusqueda){
+        
+        return `<div class="resultado">
+                <h3><a href="${resultadoBusqueda.url}">${resultadoBusqueda.title}</a></h3>
+                <span>${resultadoBusqueda.description}</span>
+            </div>`;
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maguigle</title>
+    <link rel = "stylesheet" href="style.css"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id = "main-resultados">
+        <img id = "logo-resultados" src="img/logo.png"/>
+        <input id = "buscador-resultados" type="text"/>
+        <hr/>
+        <div id="resultados">
+            <span class="total-resultados">
+                Cerca de 2.920.000.000 resultados (0,40 segundos) 
+            </span>
+            <div class="resultado">
+                <h3>Agencia de Noticias San Luis: Home</h3>
+                <span>
+                    hace 12 horas — Agencia de Noticias San Luis (ANSL) es un medio informativo del Gobierno de la Provincia de San Luis, República Argentina en formato de diario digital.
+                </span>
+            </div>
+            <div class="resultado">
+                <h3>Noticias. Últimas noticias de Argentina y el Mundo | Clarín</h3>
+                <span>
+                    hace 5 horas — Clarin.com. Noticias de la Argentina y el mundo. Información actualizada las 24 horas y en español. Informate ya.
+                </span>
+            </div>
+            <div class="resultado">
+                <h3>Últimas Noticias de Argentina y del Mundo - Infobae</h3>
+                <span>
+                    hace 3 horas — Últimas noticias, videos y fotos en tiempo real de Argentina y del mundo.
+                </span>
+            </div>
+            <div class="resultado">
+                <h3>Últimas noticias de Argentina y el mundo - LA NACION</h3>
+                <span>
+                    hace 4 horas — LA NACION ofrece las últimas noticias, fotos y videos de la Argentina y el mundo. Política, economía, deportes y toda la información en tiempo real.
+                </span>
+            </div>
+            <div class="resultado">
+                <h3>Télam - Agencia Nacional de Noticias</h3>
+                <span>
+                    Sitio web de la agencia de noticias oficial de la República Argentina. Toda la información del país y del mundo. Videos. Podcasts. Política. Sociedad.
+                </span>
+            </div>
+            <div class="resultado">
+                <h3>Últimas Noticias de Argentina y del Mundo | Todo Noticias</h3>
+                <span>
+                    hace 3 horas — Encontrá las últimas noticias del día en Argentina y el Mundo. Noticias y Primicias del sábado a las 15:35hs.
+                </span>
+            </div>
+
+        </div>
+    </div>
+
+<script>
+    let aux = document.location.href.split('?query=');
+    let query = aux[1];
+    document.getElementById("buscador-resultados").value = query;
+    
+    fetch('http://localhost:8080/api/search?query='+query)
+    .then(response => response.json())
+    .then(json =>{
+        console.log(json);
+        let html = '';
+        for(let resultadoBusqueda of json){
+            html += getResultados(resultadoBusqueda);
+        }
+    });
+
+    function getResultados(resultadoBusqueda){
+        
+        return `<div class="resultado">
+                <h3><a href="${resultadoBusqueda.url}">${resultadoBusqueda.title}</a></h3>
+                <span>${resultadoBusqueda.description}</span>
+            </div>`;
+    }
+</script>
+
+</body>
+</html>

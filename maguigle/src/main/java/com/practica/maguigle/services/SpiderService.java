@@ -1,0 +1,151 @@
+package com.practica.maguigle.services;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.practica.maguigle.entities.WebPage;
+
+import static org.hibernate.internal.util.StringHelper.isBlank;
+
+
+@Service
+public class SpiderService {
+
+	@Autowired
+	private SearchService searchService;
+	
+	public void indexWebPages() throws Exception{
+		//procesa el contenido de la web para ver de qué se trata 
+		//y lo guarda en la BD
+		
+		List<WebPage> linksToIndex = searchService.getLinksToIndex();
+		linksToIndex.stream().parallel().forEach(webPage ->{
+			try{
+				String url = webPage.getUrl();
+				String content = getWebContent(url);
+				
+				if(isBlank(content)) {
+					return;
+				}
+				
+				indexAndSaveWebPage(webPage, content);
+				
+				saveLinks(getDomain(url),content);
+			}catch (Exception e) {
+				System.out.println(e.getMessage());
+			}
+			
+		});
+		
+		
+	
+	}
+	
+	
+	private String getDomain(String url) {
+		String[] aux = url.split("/");
+		return aux[0] + "//" + aux[2];
+	}
+
+
+	private void saveLinks(String domain, String content){
+		List<String> links = getLinks(domain,content);
+		links.stream().filter(link -> !searchService.exist(link))
+				.map(link -> new WebPage(link))
+				.forEach(webPage -> searchService.save(webPage));
+		
+	}
+	
+	
+	//función para traer todos los links
+	private List<String> getLinks(String domain, String content){
+		List<String> links = new ArrayList<>();
+		String[] splitHref = content.split("/href=\"");
+		
+		//convertimos el ArrayList para poder eliminar el 
+		//primer elemento, que no nos sirve
+		List<String> listHref = Arrays.asList(splitHref);
+		
+		listHref.forEach(strHref -> {
+			String[] aux = strHref.split("\"");
+			links.add(aux[0]);
+		});
+		
+		return cleanLinks(domain,links);
+	}
+	
+	
+	private List<String> cleanLinks(String domain, List<String> links) {
+		
+		String[] excludedExtension = new String[] {"css","js","json","jpg","png","woff2"}; 
+		
+		
+		List<String> resultLinks = links.stream()
+				.filter(link -> Arrays.stream(excludedExtension)
+				.noneMatch(link::endsWith))
+				.map(link -> link.startsWith("/") ? domain+link : "link")
+				.filter(link -> link.startsWith("http"))
+				.collect(Collectors.toList());
+		
+		//Para limpiar elementos repetidos
+		List<String> uniqueLinks = new ArrayList<>();
+		uniqueLinks.addAll(new HashSet<String>(resultLinks));
+		
+		
+		return uniqueLinks;
+	}
+	
+	
+	private void indexAndSaveWebPage(WebPage webPage, String content) {
+		String title = getTitle(content);
+		String description = getDescription(content);
+		
+		webPage.setDescription(description);
+		webPage.setTitle(title);
+		
+		searchService.save(webPage);
+	}
+
+	
+	public String getTitle(String content) {
+		String[] aux = content.split("<title>");
+		String[] aux2 = aux[1].split("</title>");
+		return aux2[0];
+	}
+	
+	public String getDescription(String content) {
+		String[] aux = content.split("<meta name=\"description\" content=\"");
+		String[] aux2 = aux[1].split("\">");
+		return aux2[0];
+	}
+	
+	
+	private String getWebContent(String link) {
+        try {
+            URL url = new URL(link);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            String encoding = conn.getContentEncoding();
+
+            InputStream input = conn.getInputStream();
+
+            Stream<String> lines = new BufferedReader(new InputStreamReader(input))
+                    .lines();
+
+            return lines.collect(Collectors.joining());
+        } catch (IOException e) {
+            System.out.print(e.getMessage());
+        }
+        return "";
+    }
+	
+}

@@ -1,0 +1,24 @@
+package com.practica.maguigle.controllers;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.practica.maguigle.entities.WebPage;
+
+@RestController
+public class SearchController {
+	
+	@RequestMapping(value = "api/search", method = RequestMethod.GET)
+	public List<WebPage> search() {
+		List<WebPage> result = new ArrayList<>();
+		WebPage wp= new WebPage();
+		wp.setTitle("titulo");
+		wp.setDescription("prueba");
+		result.add(wp);
+		return result;
+	}
+}

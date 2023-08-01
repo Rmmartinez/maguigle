@@ -1,0 +1,26 @@
+package com.practica.maguigle.entities;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Entity
+@Table(name = "webpage")
+@Getter @Setter
+@ToString @EqualsAndHashCode
+public class WebPage {
+	private Long id;
+	
+	@Column(name = "url")
+	private String url;
+	@Column(name = "title")
+	private String title; 
+	@Column(name = "description")
+	private String description;
+	
+	
+}
